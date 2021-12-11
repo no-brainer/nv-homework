@@ -1,0 +1,9 @@
+torch
+torchaudio
+wandb
+matplotlib
+numpy
+librosa
+pandas
+tqdm
+gdown
