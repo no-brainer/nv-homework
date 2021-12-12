@@ -115,8 +115,32 @@ class SubMPD(nn.Module):
 
 class SubMSD(nn.Module):
 
-    def __init__(self):
+    def __init__(self, filter_counts, kernel_sizes, strides, groups, use_spectral_norm=False, relu_slope=0.2):
         super(SubMSD, self).__init__()
 
-    def forward(self):
-        pass
+        self.relu_slope = relu_slope
+
+        norm = nn.utils.spectral_norm if use_spectral_norm else nn.utils.weight_norm
+
+        self.convs = nn.ModuleList()
+        for i in range(len(filter_counts)):
+            in_filters = 1 if i == 0 else filter_counts[i - 1]
+            padding = get_same_padding(kernel_sizes[i])
+
+            self.convs.append(
+                norm(nn.Conv1d(in_filters, filter_counts[i], kernel_sizes[i],
+                               stride=strides[i], groups=groups[i], padding=padding))
+            )
+
+        self.convs.append(
+            norm(nn.Conv1d(filter_counts[-1], 1, 3, padding=1))
+        )
+
+    def forward(self, x):
+        fmap = []
+
+        for conv in self.convs:
+            x = F.leaky_relu(conv(x), negative_slope=self.relu_slope)
+            fmap.append(x.clone())
+
+        return x.squeeze(1), fmap

@@ -11,15 +11,15 @@ class MPDiscriminator(BaseModel):
     def __init__(self, periods, filter_counts):
         super(MPDiscriminator, self).__init__()
 
-        self.modules = nn.ModuleList()
+        self.discs = nn.ModuleList()
         for period in periods:
-            self.modules.append(SubMPD(period, filter_counts))
+            self.discs.append(SubMPD(period, filter_counts))
 
     def forward(self, waveform_real, waveform_fake, *args, **kwargs):
         outs_real, outs_fake = [], []
         fmaps_real, fmaps_fake = [], []
 
-        for disc in self.modules:
+        for disc in self.discs:
             out_real, fmap_real = disc(waveform_real)
             outs_real.append(out_real)
             fmaps_real.append(fmap_real)
