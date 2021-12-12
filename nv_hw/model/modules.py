@@ -73,3 +73,50 @@ class MRFFusion(nn.Module):
     def remove_weight_norm(self):
         for layer in self.layers:
             layer.remove_weight_norm()
+
+
+class SubMPD(nn.Module):
+
+    def __init__(self, period, filter_counts, kernel_size=5, stride=3, use_spectral_norm=False, relu_slope=0.2):
+        super(SubMPD, self).__init__()
+
+        self.period = period
+        self.relu_slope = relu_slope
+
+        norm = nn.utils.spectral_norm if use_spectral_norm else nn.utils.weight_norm
+
+        padding = get_same_padding(kernel_size)
+
+        self.convs = nn.ModuleList()
+        for i in range(len(filter_counts)):
+            in_filters = 1 if i == 0 else filter_counts[i - 1]
+            self.convs.append(norm(nn.Conv2d(in_filters, filter_counts[i],
+                                             kernel_size=(kernel_size, 1), stride=(stride, 1), padding=(padding, 0))))
+
+        self.convs.append(
+            norm(nn.Conv2d(filter_counts[-1], 1, kernel_size=(3, 1), padding=(1, 0)))
+        )
+
+    def forward(self, x):
+        fmap = []
+
+        t = x.size(2)
+        if t % self.period:
+            pad_size = self.period - (t % self.period)
+            x = F.pad(x, (0, pad_size), "reflect")
+            t += pad_size
+
+        for conv in self.convs:
+            x = F.leaky_relu(conv(x), negative_slope=self.relu_slope)
+            fmap.append(x.clone())
+
+        return x.squeeze(1), fmap
+
+
+class SubMSD(nn.Module):
+
+    def __init__(self):
+        super(SubMSD, self).__init__()
+
+    def forward(self):
+        pass
