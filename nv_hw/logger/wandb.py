@@ -1,8 +1,6 @@
 from datetime import datetime
 
-import PIL
-
-from .util import plot_spectrogram_to_buf
+from .util import plot_spectrogram_to_numpy
 
 
 class WanDBWriter:
@@ -54,13 +52,10 @@ class WanDBWriter:
         }, step=self.step)
 
     def add_image(self, scalar_name, image):
-        buf = plot_spectrogram_to_buf(image.detach().cpu().T)
-        img = PIL.Image.open(buf)
+        image = plot_spectrogram_to_numpy(image)
         self.wandb.log({
-            self.scalar_name(scalar_name): self.wandb.Image(img)
+            self.scalar_name(scalar_name): self.wandb.Image(image)
         }, step=self.step)
-        img.close()
-        buf.close()
 
     def add_audio(self, scalar_name, audio, sample_rate=None):
         audio = audio.detach().cpu().numpy().T
