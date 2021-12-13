@@ -1,0 +1,110 @@
+{
+  "name": "config",
+  "melspec": {
+    "sr": 22050,
+    "win_length": 1024,
+    "hop_length": 256,
+    "n_fft": 1024,
+    "f_min": 0,
+    "f_max": 8000,
+    "n_mels": 80,
+    "power": 1.0
+  },
+  "gen_arch": {
+    "type": "Generator",
+    "args": {
+      "n_mels": 80,
+      "preconv_kernel_size": 7,
+      "postconv_kernel_size": 7,
+      "conv_t_kernel_sizes": [16, 16, 4, 4],
+      "n_mrf_blocks": 3,
+      "hidden_channels": 512,
+      "kernel_sizes": [3, 7, 11],
+      "dilation_rates_2d": [[1, 1], [3, 1], [5, 1]],
+      "relu_slope": 0.2
+    }
+  },
+  "msd_arch": {
+    "type": "MSDiscriminator",
+    "args": {
+      "filter_counts": [128, 128, 256, 512, 1024, 1024],
+      "kernel_sizes": [15, 41, 41, 41, 41, 41, 5],
+      "strides": [1, 2, 2, 4, 4, 1, 1],
+      "groups": [1, 4, 16, 16, 16, 16, 1],
+      "use_spectral_norms": [true, false, false],
+      "pool_kernel": 4,
+      "pool_stride": 2
+    }
+  },
+  "mpd_arch": {
+    "type": "MPDiscriminator",
+    "args": {
+      "periods": [2, 3, 5, 7, 11],
+      "filter_counts": [32, 128, 512, 1024, 1024]
+    }
+  },
+  "data": {
+    "train": {
+      "batch_size": 4,
+      "num_workers": 2,
+      "dataset": {
+        "type": "LJSpeechDataset",
+        "args": {
+          "root": "./data/datasets",
+          "mode": "train",
+          "segment_size": 8192
+        }
+      }
+    },
+    "val": {
+      "batch_size": 4,
+      "num_workers": 2,
+      "dataset": {
+        "type": "LJSpeechDataset",
+        "args": {
+          "root": "./data/datasets",
+          "mode": "val",
+          "segment_size": 8192
+        }
+      }
+    }
+  },
+  "gen_opt": {
+    "type": "AdamW",
+    "args": {
+      "lr": 3e-4,
+      "betas": [0.8, 0.99]
+    }
+  },
+  "disc_opt": {
+    "type": "AdamW",
+    "args": {
+      "lr": 3e-4,
+      "betas": [0.8, 0.99]
+    }
+  },
+  "gen_scheduler": {
+    "type": "ExponentialLR",
+    "args": {
+      "gamma": 0.999
+    }
+  },
+  "disc_scheduler": {
+    "type": "ExponentialLR",
+    "args": {
+      "gamma": 0.999
+    }
+  },
+  "trainer": {
+    "epochs": 50,
+    "len_epoch": 100,
+    "save_dir": "saved/",
+    "save_period": 5,
+    "verbosity": 2,
+    "monitor": "min val_loss",
+    "early_stop": -1,
+    "visualize": "wandb",
+    "wandb_project": "hw_vocoder",
+    "grad_norm_clip": 1000
+  }
+}

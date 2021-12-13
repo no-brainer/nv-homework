@@ -47,7 +47,7 @@ class Trainer(BaseTrainer):
         self.do_validation = self.valid_data_loader is not None
         self.gen_scheduler = gen_scheduler
         self.disc_scheduler = disc_scheduler
-        self.log_step = 10
+        self.log_step = 25
         self.sr = sr
 
         self.losses = {
