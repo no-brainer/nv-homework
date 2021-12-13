@@ -18,7 +18,6 @@ def get_dataloaders(configs: ConfigParser):
         else:
             raise Exception()
 
-        dataloaders[split] = DataLoader(dataset, batch_size=bs, collate_fn=CollatorFn(),
-                                        shuffle=shuffle, num_workers=num_workers)
+        dataloaders[split] = DataLoader(dataset, batch_size=bs, shuffle=shuffle, num_workers=num_workers)
 
     return dataloaders

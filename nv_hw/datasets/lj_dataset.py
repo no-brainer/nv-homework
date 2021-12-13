@@ -64,7 +64,10 @@ class LJSpeechDataset(torchaudio.datasets.LJSPEECH):
 
         transcript = self._normalize_transcript(transcript)
 
-        return waveform, transcript
+        return {
+            "waveforms_real": waveform,
+            "transcripts": transcript,
+        }
 
     @staticmethod
     def _normalize_transcript(transcript):
