@@ -2,10 +2,9 @@ from torch.utils.data import DataLoader
 
 import nv_hw.datasets
 from nv_hw.collate_fn import CollatorFn
-from nv_hw.utils import ConfigParser
 
 
-def get_dataloaders(configs: ConfigParser):
+def get_dataloaders(configs):
     dataloaders = {}
     for split, params in configs["data"].items():
         num_workers = params.get("num_workers", 1)
