@@ -39,7 +39,7 @@ class ResBlock(nn.Module):
 
         layers = []
         for kernel_size, dilation_rates in zip(kernel_sizes, dilation_rates_2d):
-            self.layers.append(ResBlockInner(hidden_channels, kernel_size, dilation_rates, relu_slope))
+            layers.append(ResBlockInner(hidden_channels, kernel_size, dilation_rates, relu_slope))
 
         self.net = nn.Sequential(*layers)
 
@@ -60,7 +60,7 @@ class MRFFusion(nn.Module):
         self.layers = nn.ModuleList()
         for _ in range(n_blocks):
             self.layers.append(
-                ResBlockInner(hidden_channels, kernel_sizes, dilation_rates_2d, relu_slope)
+                ResBlock(hidden_channels, kernel_sizes, dilation_rates_2d, relu_slope)
             )
 
     def forward(self, x):
@@ -100,11 +100,12 @@ class SubMPD(nn.Module):
     def forward(self, x):
         fmap = []
 
-        t = x.size(2)
+        batch_size, channels, t = x.shape
         if t % self.period:
             pad_size = self.period - (t % self.period)
             x = F.pad(x, (0, pad_size), "reflect")
             t += pad_size
+        x = x.view(batch_size, channels, t // self.period, self.period)
 
         for conv in self.convs:
             x = F.leaky_relu(conv(x), negative_slope=self.relu_slope)

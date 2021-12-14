@@ -27,7 +27,7 @@
   "msd_arch": {
     "type": "MSDiscriminator",
     "args": {
-      "filter_counts": [128, 128, 256, 512, 1024, 1024],
+      "filter_counts": [128, 128, 256, 512, 1024, 1024, 1024],
       "kernel_sizes": [15, 41, 41, 41, 41, 41, 5],
       "strides": [1, 2, 2, 4, 4, 1, 1],
       "groups": [1, 4, 16, 16, 16, 16, 1],
@@ -45,7 +45,7 @@
   },
   "data": {
     "train": {
-      "batch_size": 4,
+      "batch_size": 16,
       "num_workers": 2,
       "dataset": {
         "type": "LJSpeechDataset",
@@ -57,7 +57,7 @@
       }
     },
     "val": {
-      "batch_size": 4,
+      "batch_size": 16,
       "num_workers": 2,
       "dataset": {
         "type": "LJSpeechDataset",
@@ -96,11 +96,11 @@
     }
   },
   "trainer": {
-    "epochs": 50,
-    "len_epoch": 100,
+    "epochs": 300,
+    "len_epoch": 300,
     "save_dir": "saved/",
     "save_period": 5,
-    "verbosity": 2,
+    "verbosity": 0,
     "monitor": "min val_loss",
     "early_stop": -1,
     "visualize": "wandb",

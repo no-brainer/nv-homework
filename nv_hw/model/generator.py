@@ -41,7 +41,7 @@ class Generator(BaseModel):
                 nn.LeakyReLU(negative_slope=relu_slope),
                 nn.utils.weight_norm(nn.ConvTranspose1d(channels * 2, channels, conv_t_kernel_size,
                                                         stride=stride, padding=padding)),
-                MRFFusion(n_mrf_blocks, channels, kernel_sizes, dilation_rates_2d, relu_slope=0.2),
+                MRFFusion(n_mrf_blocks, channels, kernel_sizes, dilation_rates_2d, relu_slope=relu_slope),
             ])
 
         self.net = nn.Sequential(*upsample_blocks)
@@ -52,7 +52,7 @@ class Generator(BaseModel):
     def forward(self, melspecs, *args, **kwargs):
         out = self.net(self.pre_conv(melspecs))
         out = self.post_conv(F.leaky_relu(out, negative_slope=self.relu_slope))
-        return F.tanh(out)
+        return torch.tanh(out)
 
     def remove_weight_norm(self):
         nn.utils.remove_weight_norm(self.pre_conv)

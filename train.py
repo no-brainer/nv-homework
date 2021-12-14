@@ -22,10 +22,10 @@ np.random.seed(SEED)
 def main(config):
     logger = config.get_logger("train")
 
-    # melspec featurizer
-    featurizer = MelSpectrogram(**config["melspec"])
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # melspec featurizer
+    featurizer = MelSpectrogram(**config["melspec"]).to(device)
 
     # create generator
     gen = config.init_obj(config["gen_arch"], module_arch).to(device)

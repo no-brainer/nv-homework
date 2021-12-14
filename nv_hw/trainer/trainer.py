@@ -71,7 +71,7 @@ class Trainer(BaseTrainer):
         """
         Move all necessary tensors to the GPU
         """
-        for tensor_for_gpu in ["waveforms_real", "melspecs_real"]:
+        for tensor_for_gpu in ["waveforms_real"]:
             batch[tensor_for_gpu] = batch[tensor_for_gpu].to(device)
         return batch
 
@@ -129,9 +129,10 @@ class Trainer(BaseTrainer):
 
             if batch_idx % self.log_step == 0:
                 self.writer.set_step((epoch - 1) * self.len_epoch + batch_idx)
+                loss_key = "loss_g" if batch.get("loss_g") is not None else "loss_d"
                 self.logger.debug(
-                    "Train Epoch: {} {} Loss: {:.6f}".format(
-                        epoch, self._progress(batch_idx), batch["loss_g"].item()
+                    "Train Epoch: {} {} {}: {:.6f}".format(
+                        epoch, self._progress(batch_idx), loss_key, batch[loss_key]
                     )
                 )
                 self.writer.add_scalar(
@@ -153,11 +154,11 @@ class Trainer(BaseTrainer):
         return log
 
     def process_batch(self, batch_idx, batch, is_train: bool, metrics: MetricTracker):
-        batch["melspecs_real"] = self.featurizer(batch["waveforms_real"])
-
         batch = self.move_batch_to_device(batch, self.device)
 
-        batch["waveforms_fake"] = self.gen_model(**batch)
+        batch["melspecs_real"] = self.featurizer(batch["waveforms_real"])
+
+        batch["waveforms_fake"] = self.gen_model(batch["melspecs_real"])
         batch["melspecs_fake"] = self.featurizer(batch["waveforms_fake"])
 
         if batch_idx % 2:
@@ -176,6 +177,7 @@ class Trainer(BaseTrainer):
                 metrics.update("grad_norm_msd", self.get_grad_norm(self.disc_msd))
 
             metrics.update("loss_d", loss_d.item())
+            batch["loss_d"] = loss_d.item()
 
         else:
             # generator step
@@ -206,6 +208,7 @@ class Trainer(BaseTrainer):
                 metrics.update("grad_norm_g", self.get_grad_norm(self.gen_model))
 
             metrics.update("loss_g", loss_g.item())
+            batch["loss_g"] = loss_g.item()
 
         return batch
 
@@ -261,8 +264,8 @@ class Trainer(BaseTrainer):
             **kwargs
     ):
         self.writer.add_image("real_melspec", melspecs_real[0].detach().cpu())
-        self.writer.add_audio("real_audio", waveforms_real[0].detach().cpu())
-        self.writer.add_audio("fake_audio", waveforms_fake[0].detach().cpu())
+        self.writer.add_audio("real_audio", waveforms_real[0].detach().cpu(), self.sr)
+        self.writer.add_audio("fake_audio", waveforms_fake[0].detach().cpu(), self.sr)
         self.writer.add_text("transcript", transcripts[0])
 
     @torch.no_grad()
