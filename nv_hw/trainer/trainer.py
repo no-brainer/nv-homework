@@ -215,8 +215,8 @@ class Trainer(BaseTrainer):
                 loss_g.backward()
                 self.gen_opt.step()
                 metrics.update("grad_norm_g", self.get_grad_norm(self.gen_model))
-                self.gen_scheduler.step()
 
+            metrics.update("loss_g", loss_g.item())
             batch["loss_g"] = loss_g.item()
 
         return batch
