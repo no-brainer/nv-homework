@@ -74,21 +74,21 @@
   "gen_opt": {
     "type": "AdamW",
     "args": {
-      "lr": 3e-3,
+      "lr": 2e-4,
       "betas": [0.8, 0.99]
     }
   },
   "disc_opt": {
     "type": "AdamW",
     "args": {
-      "lr": 3e-3,
+      "lr": 2e-4,
       "betas": [0.8, 0.99]
     }
   },
   "gen_scheduler": {
     "type": "ExponentialLR",
     "args": {
-      "gamma": 0.9999
+      "gamma": 0.999
     }
   },
   "disc_scheduler": {
