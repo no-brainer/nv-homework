@@ -34,11 +34,11 @@ class ResBlockInner(nn.Module):
 
 class ResBlock(nn.Module):
 
-    def __init__(self, hidden_channels, kernel_sizes, dilation_rates_2d, relu_slope=0.2):
+    def __init__(self, hidden_channels, kernel_size, dilation_rates_2d, relu_slope=0.2):
         super(ResBlock, self).__init__()
 
         layers = []
-        for kernel_size, dilation_rates in zip(kernel_sizes, dilation_rates_2d):
+        for dilation_rates in dilation_rates_2d:
             layers.append(ResBlockInner(hidden_channels, kernel_size, dilation_rates, relu_slope))
 
         self.net = nn.Sequential(*layers)
@@ -58,9 +58,9 @@ class MRFFusion(nn.Module):
 
         self.n_blocks = n_blocks
         self.layers = nn.ModuleList()
-        for _ in range(n_blocks):
+        for kernel_size in kernel_sizes:
             self.layers.append(
-                ResBlock(hidden_channels, kernel_sizes, dilation_rates_2d, relu_slope)
+                ResBlock(hidden_channels, kernel_size, dilation_rates_2d, relu_slope)
             )
 
     def forward(self, x):

@@ -64,6 +64,8 @@ def main(config):
         config=config,
         data_loader=dataloaders["train"],
         valid_data_loader=dataloaders["val"],
+        data_loader_full=dataloaders["train_full"],
+        valid_data_loader_full=dataloaders["val_full"],
         len_epoch=config["trainer"].get("len_epoch", None)
     )
 

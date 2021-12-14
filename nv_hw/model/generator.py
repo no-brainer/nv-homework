@@ -23,9 +23,11 @@ class Generator(BaseModel):
     ):
         super(Generator, self).__init__()
 
-        self.pre_conv = nn.Conv1d(n_mels, hidden_channels,
-                                  kernel_size=preconv_kernel_size,
-                                  padding=get_same_padding(preconv_kernel_size))
+        self.pre_conv = nn.utils.weight_norm(
+            nn.Conv1d(n_mels, hidden_channels,
+                      kernel_size=preconv_kernel_size,
+                      padding=get_same_padding(preconv_kernel_size))
+        )
 
         self.num_upsample_blocks = len(conv_t_kernel_sizes)
         self.relu_slope = relu_slope

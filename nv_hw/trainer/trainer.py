@@ -27,7 +27,9 @@ class Trainer(BaseTrainer):
             device,
             featurizer,
             data_loader,
+            data_loader_full,
             valid_data_loader=None,
+            valid_data_loader_full=None,
             len_epoch=None,
             skip_oom=True,
             sr=22050
@@ -47,8 +49,11 @@ class Trainer(BaseTrainer):
         self.do_validation = self.valid_data_loader is not None
         self.gen_scheduler = gen_scheduler
         self.disc_scheduler = disc_scheduler
-        self.log_step = 25
+        self.log_step = 50
         self.sr = sr
+
+        self.data_loader_full = data_loader_full
+        self.valid_data_loader_full = valid_data_loader_full
 
         self.losses = {
             "mel_loss": MelLoss(),
@@ -127,7 +132,7 @@ class Trainer(BaseTrainer):
                 else:
                     raise e
 
-            if batch_idx % self.log_step == 0:
+            if (batch_idx + 1) % self.log_step == 0:
                 self.writer.set_step((epoch - 1) * self.len_epoch + batch_idx)
                 loss_key = "loss_g" if batch.get("loss_g") is not None else "loss_d"
                 self.logger.debug(
@@ -146,6 +151,8 @@ class Trainer(BaseTrainer):
                 self.train_metrics.reset()
 
         log = self.train_metrics.result()
+
+        self.log_inference(self.data_loader_full)
 
         if self.do_validation:
             val_log = self._valid_epoch(epoch)
@@ -244,6 +251,8 @@ class Trainer(BaseTrainer):
         self._log_scalars(self.valid_metrics)
         self._log_media(**batch)
 
+        self.log_inference(self.valid_data_loader_full)
+
         return self.valid_metrics.result()
 
     def _progress(self, batch_idx):
@@ -256,19 +265,30 @@ class Trainer(BaseTrainer):
             total = self.len_epoch
         return base.format(current, total, 100.0 * current / total)
 
+    @torch.no_grad()
+    def log_inference(self, dataloader):
+        self.gen_model.eval()
+
+        batch = self.move_batch_to_device(next(iter(dataloader)), self.device)
+        batch["melspecs_real"] = self.featurizer(batch["waveforms_real"])
+        batch["waveforms_fake"] = self.gen_model(batch["melspecs_real"])
+
+        self._log_media(**batch, label="full")
+
     def _log_media(
             self,
             melspecs_real,
             waveforms_real,
             waveforms_fake,
             transcripts,
+            label="",
             *args,
             **kwargs
     ):
-        self.writer.add_image("real_melspec", melspecs_real[0].detach().cpu())
-        self.writer.add_audio("real_audio", waveforms_real[0].detach().cpu(), self.sr)
-        self.writer.add_audio("fake_audio", waveforms_fake[0].detach().cpu(), self.sr)
-        self.writer.add_text("transcript", transcripts[0])
+        self.writer.add_image(f"real_melspec_{label}", melspecs_real[0].detach().cpu())
+        self.writer.add_audio(f"real_audio_{label}", waveforms_real[0].detach().cpu(), self.sr)
+        self.writer.add_audio(f"fake_audio_{label}", waveforms_fake[0].detach().cpu(), self.sr)
+        self.writer.add_text(f"transcript_{label}", transcripts[0])
 
     @torch.no_grad()
     def get_grad_norm(self, model, norm_type=2):
