@@ -46,7 +46,7 @@
   "data": {
     "train": {
       "batch_size": 16,
-      "num_workers": 2,
+      "num_workers": 8,
       "dataset": {
         "type": "LJSpeechDataset",
         "args": {
@@ -58,7 +58,7 @@
     },
     "val": {
       "batch_size": 16,
-      "num_workers": 2,
+      "num_workers": 8,
       "dataset": {
         "type": "LJSpeechDataset",
         "args": {
@@ -96,12 +96,12 @@
     }
   },
   "trainer": {
-    "epochs": 300,
-    "len_epoch": 300,
+    "epochs": 3000,
+    "len_epoch": 500,
     "save_dir": "saved/",
     "save_period": 5,
     "verbosity": 0,
-    "monitor": "min val_loss",
+    "monitor": "min val_g_loss",
     "early_stop": -1,
     "visualize": "wandb",
     "wandb_project": "hw_vocoder",
