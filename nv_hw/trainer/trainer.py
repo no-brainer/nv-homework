@@ -153,6 +153,8 @@ class Trainer(BaseTrainer):
         log = self.train_metrics.result()
 
         self.log_inference(self.data_loader_full)
+        self.disc_scheduler.step()
+        self.gen_scheduler.step()
 
         if self.do_validation:
             val_log = self._valid_epoch(epoch)
@@ -182,7 +184,6 @@ class Trainer(BaseTrainer):
                 self.disc_opt.step()
                 metrics.update("grad_norm_mpd", self.get_grad_norm(self.disc_mpd))
                 metrics.update("grad_norm_msd", self.get_grad_norm(self.disc_msd))
-                self.disc_scheduler.step()
 
             metrics.update("loss_d", loss_d.item())
             batch["loss_d"] = loss_d.item()
@@ -216,7 +217,6 @@ class Trainer(BaseTrainer):
                 metrics.update("grad_norm_g", self.get_grad_norm(self.gen_model))
                 self.gen_scheduler.step()
 
-            metrics.update("loss_g", loss_g.item())
             batch["loss_g"] = loss_g.item()
 
         return batch
