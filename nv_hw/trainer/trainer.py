@@ -175,6 +175,7 @@ class Trainer(BaseTrainer):
                 self.disc_opt.step()
                 metrics.update("grad_norm_mpd", self.get_grad_norm(self.disc_mpd))
                 metrics.update("grad_norm_msd", self.get_grad_norm(self.disc_msd))
+                self.disc_scheduler.step()
 
             metrics.update("loss_d", loss_d.item())
             batch["loss_d"] = loss_d.item()
@@ -206,6 +207,7 @@ class Trainer(BaseTrainer):
                 loss_g.backward()
                 self.gen_opt.step()
                 metrics.update("grad_norm_g", self.get_grad_norm(self.gen_model))
+                self.gen_scheduler.step()
 
             metrics.update("loss_g", loss_g.item())
             batch["loss_g"] = loss_g.item()
