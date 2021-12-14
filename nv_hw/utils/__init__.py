@@ -1,2 +1,1 @@
-from .util import *
-from .parse_config import ConfigParser
+from nv_hw.utils.util import *

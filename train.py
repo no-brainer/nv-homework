@@ -8,7 +8,7 @@ import nv_hw.model as module_arch
 from nv_hw.datasets.util import get_dataloaders
 from nv_hw.featurizer import MelSpectrogram
 from nv_hw.trainer import Trainer
-from nv_hw.utils import ConfigParser
+from nv_hw.utils.parse_config import ConfigParser
 
 
 SEED = 0
