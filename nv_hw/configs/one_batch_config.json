@@ -45,28 +45,28 @@
   },
   "data": {
     "train": {
-      "batch_size": 4,
+      "batch_size": 1,
       "num_workers": 2,
       "dataset": {
         "type": "LJSpeechDataset",
         "args": {
           "root": "./data/datasets",
           "mode": "train",
-          "segment_size": 8192,
-          "limit": 4
+          "segment_size": 32768,
+          "limit": 1
         }
       }
     },
     "val": {
-      "batch_size": 4,
+      "batch_size": 1,
       "num_workers": 2,
       "dataset": {
         "type": "LJSpeechDataset",
         "args": {
           "root": "./data/datasets",
           "mode": "val",
-          "segment_size": 8192,
-          "limit": 4
+          "segment_size": 32768,
+          "limit": 1
         }
       }
     }
