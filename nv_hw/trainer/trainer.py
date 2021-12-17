@@ -194,22 +194,22 @@ class Trainer(BaseTrainer):
                 batch["melspecs_real"], batch["melspecs_fake"]
             )
 
-            # _, outs_p_fake, fmaps_p_real, fmaps_p_fake = self.disc_mpd(
-            #     batch["waveforms_real"], batch["waveforms_fake"]
-            # )
-            # _, outs_s_fake, fmaps_s_real, fmaps_s_fake = self.disc_msd(
-            #     batch["waveforms_real"], batch["waveforms_fake"]
-            # )
-            #
-            # loss_g += (
-            #     self.losses["feat_loss"](fmaps_p_real, fmaps_p_fake) +
-            #     self.losses["feat_loss"](fmaps_s_real, fmaps_s_real)
-            # )
-            #
-            # loss_gen_p, _ = self.losses["gen_loss"](outs_p_fake)
-            # loss_gen_s, _ = self.losses["gen_loss"](outs_s_fake)
-            #
-            # loss_g += loss_gen_p + loss_gen_s
+            _, outs_p_fake, fmaps_p_real, fmaps_p_fake = self.disc_mpd(
+                batch["waveforms_real"], batch["waveforms_fake"]
+            )
+            _, outs_s_fake, fmaps_s_real, fmaps_s_fake = self.disc_msd(
+                batch["waveforms_real"], batch["waveforms_fake"]
+            )
+
+            loss_g += (
+                self.losses["feat_loss"](fmaps_p_real, fmaps_p_fake) +
+                self.losses["feat_loss"](fmaps_s_real, fmaps_s_real)
+            )
+
+            loss_gen_p, _ = self.losses["gen_loss"](outs_p_fake)
+            loss_gen_s, _ = self.losses["gen_loss"](outs_s_fake)
+
+            loss_g += loss_gen_p + loss_gen_s
 
             if is_train:
                 loss_g.backward()
@@ -285,7 +285,6 @@ class Trainer(BaseTrainer):
             *args,
             **kwargs
     ):
-        self.writer.add_image(f"real_melspec_{label}", melspecs_real[0].detach().cpu())
         self.writer.add_audio(f"real_audio_{label}", waveforms_real[0].detach().cpu(), self.sr)
         self.writer.add_audio(f"fake_audio_{label}", waveforms_fake[0].detach().cpu(), self.sr)
         self.writer.add_text(f"transcript_{label}", transcripts[0])
