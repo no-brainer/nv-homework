@@ -40,7 +40,7 @@ Generator is trained with [V1 config](./nv_hw/configs/config.json) from the pape
 
 ## Report
 
-The training was successful with the first config that I tried. Since model takes a long time to train I did not try training with different hyperparameters.
+The training was successful with the first config that I tried. Since model takes a long time to train I did not try training with different hyperparameters. A lot of information about the model and its parameters has to be lifted from [the repository](https://github.com/jik876/hifi-gan), because some parameters are hard-coded into the model and are not mentioned in the paper. 
 
 The paper is quite difficult to replicate without going through the official implementation. Some of the hyperparameters are omitted and some crucial parts of the training setup do not have enough details.
 
