@@ -1,6 +1,6 @@
 # Neural vocoder project
 
-This is an implementation of [HiFi GAN paper](https://arxiv.org/abs/2010.05646).
+This is an implementation of the [HiFi GAN paper](https://arxiv.org/abs/2010.05646).
 
 ## Installation
 
