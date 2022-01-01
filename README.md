@@ -1,5 +1,7 @@
 # Neural vocoder project
 
+This is an implementation of [HiFi GAN paper](https://arxiv.org/abs/2010.05646).
+
 ## Installation
 
 ```shell script
@@ -78,10 +80,4 @@ I did not do any experiments with full training, but I tried multiple setups for
 
 One important feature of this architecture is that you have to train it on short snippets (8192 samples in the original paper), otherwise it does not fit on a single 16 Gb GPU. I tried training my model on a dataset of 4 audio samples. From each sample I cut a snippet, that contains 8192 samples. The log for this model is in [W&B](https://wandb.ai/ngtvx/hw_vocoder/runs/32axrg33?workspace=user-ngtvx). After 11 hours and 30 minutes the model was able to only reach the loss of around 5.
 
-One other hand, I tried training with batch size 1, but larger snippet size (32768). Interestingly enough, larger snippet size significantly improved convergence. After just 9 hours of training my model reached the loss of around 3.5. The logs are in [W&B](https://wandb.ai/ngtvx/hw_vocoder/runs/1vh0say0). 
-
-### Challenges
-
-💖 DataSphere 💖, as usual. Since S3 buckets are slow, I hoped to load LJSpeech to the disk and load data from there to speed up training. Unfortunately, for some reason bzip2 was not installed, so there was no way to unpack LJSpeech archive. Very nice!
-
-Also, it seems like disk resizing does not really work. I resized my disk to 20 Gb, but my training process still died once saved data reached 10 Gb. I hope that I won't have to deal with this service next semester...
+One other hand, I tried training with batch size 1, but larger snippet size (32768). Interestingly enough, larger snippet size significantly improved convergence. After just 9 hours of training my model reached the loss of around 3.5. The logs are in [W&B](https://wandb.ai/ngtvx/hw_vocoder/runs/1vh0say0).
